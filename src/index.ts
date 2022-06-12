@@ -29,7 +29,7 @@ app.delete('*', function(req, res){
 async function main() {
 	await prisma.$connect();
   app.listen(process.env.API_PORT, () => {
-    console.log(`Artices app is listening on port ${process.env.API_PORT}`);
+    console.log(`Articles app is listening on port ${process.env.API_PORT}`);
   })
 }
 
