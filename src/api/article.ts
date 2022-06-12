@@ -19,7 +19,7 @@ router.post('', async (req: Request, res: Response) => {
 			return res.status(401).send('Invalid Token');			
 		}
 
-		const { title, slug } = req.body;
+		const { title, slug, privateArticle } = req.body;
 		let { published_at } = req.body;
 		
 		published_at = new Date(published_at);
@@ -32,6 +32,7 @@ router.post('', async (req: Request, res: Response) => {
 				title,
 				slug,
 				published_at,
+				privateArticle,
 			},
 		})
 
@@ -73,19 +74,39 @@ router.delete('/:id', async (req: Request, res: Response) => {
 // GET /api/articles
 router.get('', async (req: Request, res: Response) => {
   try {
+		const token = req.headers.authorization;
 		const { id } = req.query;
 
 		if (!id) return res.status(400).send('Missing id query parameter');
 
-		const articleResponse = await prisma.article.findUnique({
-			where: {
-				id,
-			},
-		});
+		if (!token) {
+			const articleResponse = await prisma.article.findUnique({
+				where: {
+					id,
+				},
+			});
 
-		if (!articleResponse) return res.status(404).send('Article not Found');
+			if (!articleResponse) return res.status(404).send('Article not Found');
+			if (articleResponse.privateArticle) return res.status(400).send('Article is private');
 
-    res.send(articleResponse);
+			res.send(articleResponse);
+		} else {
+			try {
+				jwt.verify(token.split(' ')[1], process.env.JWT_SECRET_KEY);
+			} catch (error) {
+				return res.status(401).send('Invalid Token');			
+			}
+
+			const articleResponse = await prisma.article.findUnique({
+				where: {
+					id,
+				},
+			});
+
+			if (!articleResponse) return res.status(404).send('Article not Found');
+
+			res.send(articleResponse);
+		}
   } catch (e) {
 		console.error(e);
     res.status(500).send('Something went wrong');
@@ -95,6 +116,7 @@ router.get('', async (req: Request, res: Response) => {
 // GET /api/articles
 router.get('/published', async (req: Request, res: Response) => {
   try {
+		const token = req.headers.authorization;
 		let skip = 0;
 		const take = 10;
 		const order = {
@@ -112,22 +134,50 @@ router.get('/published', async (req: Request, res: Response) => {
 
 		if (page > 1) skip = 10 * page;
 
-		const articleResponse = await prisma.article.findMany({
-			skip,
-			take,
-			where: {
-				NOT: {
-					published_at: null,
-				}
-			},
-			orderBy: {
-				published_at: publishedAt,
-			},
-		});
+		if (!token) {
+			const articleResponse = await prisma.article.findMany({
+				skip,
+				take,
+				where: {
+					NOT: {
+						published_at: null,
+					},
+					AND: {
+						privateArticle: false,
+					}
+				},
+				orderBy: {
+					published_at: publishedAt,
+				},
+			});
 
-		if (!articleResponse) return res.status(404).send('Article not Found');
+			if (!articleResponse) return res.status(404).send('Article not Found');
 
-    res.send(articleResponse);
+			return res.send(articleResponse);
+		} else {
+			try {
+				jwt.verify(token.split(' ')[1], process.env.JWT_SECRET_KEY);
+			} catch (error) {
+				return res.status(401).send('Invalid Token');			
+			}
+
+			const articleResponse = await prisma.article.findMany({
+				skip,
+				take,
+				where: {
+					NOT: {
+						published_at: null,
+					}
+				},
+				orderBy: {
+					published_at: publishedAt,
+				},
+			});
+
+			if (!articleResponse) return res.status(404).send('Article not Found');
+
+			return res.send(articleResponse);
+		}
   } catch (e) {
 		console.error(e);
     res.status(500).send('Something went wrong');

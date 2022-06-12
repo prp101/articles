@@ -15,6 +15,7 @@ model Article {
   title  String
   slug  String
   published_at  DateTime? @db.Date
+  privateArticle Boolean @default(false)
 }
 
 model User {
