@@ -1,5 +1,6 @@
 import express from 'express';
 import * as dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
 import articleRoutes from './api/article';
 import userRoutes from './api/user';
 import { PrismaClient } from '@prisma/client';
@@ -9,6 +10,7 @@ dotenv.config();
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
 app.use('/api/articles', articleRoutes);
 app.use('/api/users', userRoutes);
 
