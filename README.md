@@ -39,4 +39,5 @@ POST /api/users/login
 POST /api/articles
 DELETE /api/articles/:id
 GET /api/articles?id=id
+GET /api/articles?slug=slug
 GET /api/articles/published?page=1&publishedAt=1

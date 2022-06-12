@@ -75,16 +75,25 @@ router.delete('/:id', async (req: Request, res: Response) => {
 router.get('', async (req: Request, res: Response) => {
   try {
 		const token = req.headers.authorization;
-		const { id } = req.query;
+		const { id, slug } = req.query;
 
-		if (!id) return res.status(400).send('Missing id query parameter');
+		if (!id && !slug) return res.status(400).send('Missing id query parameter');
 
 		if (!token) {
-			const articleResponse = await prisma.article.findUnique({
-				where: {
-					id,
-				},
-			});
+			let articleResponse;
+			if (id) {
+				articleResponse = await prisma.article.findUnique({
+					where: {
+						id,
+					},
+				});
+			} else {
+				articleResponse = await prisma.article.findFirst({
+					where: {
+						slug,
+					},
+				});
+			}
 
 			if (!articleResponse) return res.status(404).send('Article not Found');
 			if (articleResponse.privateArticle) return res.status(400).send('Article is private');
@@ -97,11 +106,20 @@ router.get('', async (req: Request, res: Response) => {
 				return res.status(401).send('Invalid Token');			
 			}
 
-			const articleResponse = await prisma.article.findUnique({
-				where: {
-					id,
-				},
-			});
+			let articleResponse;
+			if (id) {
+				articleResponse = await prisma.article.findUnique({
+					where: {
+						id,
+					},
+				});
+			} else {
+				articleResponse = await prisma.article.findFirst({
+					where: {
+						slug,
+					},
+				});
+			}
 
 			if (!articleResponse) return res.status(404).send('Article not Found');
 
