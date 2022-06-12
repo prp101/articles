@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  postgres:
+    container_name: postgres
+    image: postgres
+    env_file: .env
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - 5432:5432
+  app:
+    container_name: app
+    restart: always
+    external_links:
+      - postgres
+    depends_on:
+      - postgres
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file: .env
+    environment:
+      - API_PORT=${API_PORT}
+      - DATABASE_URL=${DATABASE_URL}
+    ports:
+      - 3000:${API_PORT}
