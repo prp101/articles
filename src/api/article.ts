@@ -10,6 +10,8 @@ router.post('', async (req: Request, res: Response) => {
 	try {
 		const { title, slug, published_at } = req.body;
 
+		if (slug.length > 3) res.status(400).send('Slug is in invalid format')
+
 		await prisma.article.create({
 			data: {
 				id: uuidv4(),
