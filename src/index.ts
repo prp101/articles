@@ -1,6 +1,7 @@
 import express from 'express';
 import * as dotenv from 'dotenv';
 import articleRoutes from './api/article';
+import userRoutes from './api/user';
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
@@ -9,6 +10,7 @@ const app = express();
 
 app.use(express.json());
 app.use('/api/articles', articleRoutes);
+app.use('/api/users', userRoutes);
 
 app.get('*', function(req, res){
   res.status(404).send(`Invalid URL: ${req.url}`);
