@@ -1,6 +1,7 @@
 import express, { Router, Request, Response } from "express";
 import { PrismaClient } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
+import jwt from 'jsonwebtoken';
 
 const prisma = new PrismaClient();
 const router: Router = express.Router();
@@ -8,6 +9,16 @@ const router: Router = express.Router();
 // POST /api/articles
 router.post('', async (req: Request, res: Response) => {
 	try {
+		const token = req.headers.authorization;
+
+		if (!token) return res.status(401).send('Invalid Token');
+
+		try {
+			jwt.verify(token.split(' ')[1], process.env.JWT_SECRET_KEY);
+		} catch (error) {
+			return res.status(401).send('Invalid Token');			
+		}
+
 		const { title, slug } = req.body;
 		let { published_at } = req.body;
 		
@@ -34,13 +45,23 @@ router.post('', async (req: Request, res: Response) => {
 // DELETE /api/articles/:id
 router.delete('/:id', async (req: Request, res: Response) => {
 	try {
+		const token = req.headers.authorization;
+
+		if (!token) return res.status(401).send('Invalid Token');
+
+		try {
+			jwt.verify(token.split(' ')[1], process.env.JWT_SECRET_KEY);
+		} catch (error) {
+			return res.status(401).send('Invalid Token');			
+		}
+
 		const { id } = req.params;
 
 		await prisma.article.delete({
 			where: {
 				id,
 			},
-		})
+		});
 
 		res.send();
 	} catch (e) {
@@ -60,7 +81,7 @@ router.get('', async (req: Request, res: Response) => {
 			where: {
 				id,
 			},
-		})
+		});
 
 		if (!articleResponse) return res.status(404).send('Article not Found');
 
@@ -102,7 +123,7 @@ router.get('/published', async (req: Request, res: Response) => {
 			orderBy: {
 				published_at: publishedAt,
 			},
-		})
+		});
 
 		if (!articleResponse) return res.status(404).send('Article not Found');
 

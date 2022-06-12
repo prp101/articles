@@ -43,11 +43,10 @@ router.post('/login', async (req: Request, res: Response) => {
 
 		let jwtSecretKey = process.env.JWT_SECRET_KEY;
 		let data = {
-			expiresIn: 3600,
 			userId: userResponse.id,
 		};
 
-		const token = jwt.sign(data, jwtSecretKey);
+		const token = jwt.sign(data, jwtSecretKey, { expiresIn: 3600 });
 
     res.cookie('jwt', token, { httpOnly: true });
 		res.send();
