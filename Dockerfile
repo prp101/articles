@@ -8,4 +8,4 @@ RUN npx prisma generate
 ARG API_PORT=3000
 
 EXPOSE ${API_PORT}
-CMD [ "npm", "start" ]
+CMD [ "npm", "run", "start:migrate:prod" ]

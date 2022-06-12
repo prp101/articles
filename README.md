@@ -25,11 +25,15 @@ Option A:
         JWT_SECRET_KEY=
         POSTGRES_PASSWORD=
     4) Build and run Docker with provided API_PORT parameter
-    5) Enter Docker container and run: `npx prisma migrate dev`
 
 Option B:
-    1) Run: `docker-compose up -d`
-    2) Enter app container and run: `npx prisma migrate dev`
+    1) Create .env file in root directory of project
+    2) Add and fill following variables:
+        DATABASE_URL=
+        API_PORT=
+        JWT_SECRET_KEY=
+        POSTGRES_PASSWORD=
+    3) Run: `docker-compose up -d`
 
 ## Endpoints
 

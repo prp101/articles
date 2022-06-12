@@ -10,6 +10,7 @@
     "start": "node --experimental-specifier-resolution=node build/src/index.js",
     "clean": "rimraf coverage build tmp",
     "build": "tsc -p tsconfig.json",
+    "start:migrate:prod": "prisma migrate deploy && npm run start",
     "test": "jest --coverage"
   },
   "private": true,
