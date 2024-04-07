@@ -1,4 +1,4 @@
-# Human
+# Articles project
 
 - This is test Typescript project for Articles.
 - NX was used to create boilerplate.
